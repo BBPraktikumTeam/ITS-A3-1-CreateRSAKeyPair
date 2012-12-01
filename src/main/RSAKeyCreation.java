@@ -1,5 +1,6 @@
 package main;
 
+import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.security.KeyPair;
@@ -28,31 +29,27 @@ public class RSAKeyCreation {
 			String publicKeyFilename = name + ".pub";
 			
 			byte[] publicKeyBytes = keyPair.getPublic().getEncoded();
-			//Allocating 4 Bytes for the Integer, like the example
-			ByteBuffer nameLength = ByteBuffer.allocate(4);
-			nameLength.asIntBuffer().put(name.length());
-			ByteBuffer keyLength = ByteBuffer.allocate(4);
-			keyLength.asIntBuffer().put(publicKeyBytes.length);
+		
 			// Writing Public Key into file
 			FileOutputStream fos = new FileOutputStream(publicKeyFilename);
-			fos.write(nameLength.array());
-			fos.write(name.getBytes());
-			fos.write(keyLength.array());
-			fos.write(publicKeyBytes);
-			fos.close();
+			DataOutputStream out = new DataOutputStream(fos);
+			out.writeInt(name.length());
+			out.write(name.getBytes());
+			out.writeInt(publicKeyBytes.length);
+			out.write(publicKeyBytes);
+			out.close();
 			
 			String privateKeyFilename = name + ".prv";
 			
 			byte[] privateKeyBytes = keyPair.getPrivate().getEncoded();
-
-			keyLength.asIntBuffer().put(privateKeyBytes.length);
 			//Writing Private key file
 			fos = new FileOutputStream(privateKeyFilename);
-			fos.write(nameLength.array());
-			fos.write(name.getBytes());
-			fos.write(keyLength.array());
-			fos.write(privateKeyBytes);
-			fos.close();
+			out = new DataOutputStream(fos);
+			out.writeInt(name.length());
+			out.write(name.getBytes());
+			out.writeInt(privateKeyBytes.length);
+			out.write(privateKeyBytes);
+			out.close();
 		} catch (Exception e) {
 			System.out.println("ERROR");
 			e.printStackTrace();
